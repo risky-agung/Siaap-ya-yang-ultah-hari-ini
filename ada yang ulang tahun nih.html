@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Ulang Tahun! ✨</title>
+    <style>
+        /* Desain Background & Font */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fed6e3 0%, #a8c1ef 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Kartu Utama */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            margin: 20px auto;
+        }
+
+        h1 {
+            color: #ff6b81;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            margin-top: 0;
+        }
+
+        p {
+            color: #555;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        /* Tombol Utama */
+        .btn-surprise {
+            background: #ff6b81;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4);
+            transition: 0.2s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-surprise:hover {
+            background: #ff4757;
+            transform: translateY(-2px);
+        }
+
+        /* Area Game Mencocokkan Kartu */
+        .game-container {
+            display: none; 
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            perspective: 1000px;
+        }
+
+        /* Desain Kartu Game */
+        .memory-card {
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+        }
+
+        .memory-card:active {
+            transform: scale(0.95);
+            transition: transform 0.1s;
+        }
+
+        .memory-card.flip {
+            transform: rotateY(180deg);
+        }
+
+        .front-face, .back-face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backface-visibility: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Bagian Depan Kartu (Isi Emoji) */
+        .front-face {
+            background: #fff;
+            transform: rotateY(180deg);
+            font-size: 2rem;
+        }
+
+        /* Bagian Belakang Kartu (Tertutup) */
+        .back-face {
+            background: linear-gradient(135deg, #ff6b81, #ff8797);
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        /* Teks Pesan Rahasia */
+        .secret-message {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff0f3;
+            border-left: 5px solid #2ed573;
+            border-radius: 5px;
+            color: #27ae60;
+            font-weight: bold;
+            font-style: italic;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /* Elemen Efek Confetti (Kertas Warna) */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            z-index: 1;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); top: -10px; opacity: 1; }
+            100% { transform: translateY(105vh) rotate(360deg); top: 100vh; opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Musik Latar -->
+    <audio id="bg-music" loop>
+        <source src="https://wikimedia.org" type="audio/ogg">
+        <source src="https://wikimedia.org" type="audio/mpeg">
+    </audio>
+
+    <!-- Kartu Utama -->
+    <div class="card">
+        <h1>Happy Birthday Kawanku! 🎉</h1>
+        <p>Selamat ulang tahun! Yuk, mainkan game ingatan kecil ini untuk membuka kejutan spesialnya! ✨</p>
+        
+        <button class="btn-surprise" id="start-btn" onclick="startGame()">Mulai Game & Musik 🎶</button>
+
+        <!-- Area Grid Kartu (8 Kartu / 4 Pasang) -->
+        <div class="game-container" id="game-board">
+            <div class="memory-card" data-emoji="🎂">
+                <div class="front-face">🎂</div>
+                <div class="back-face">?</div>
+            </div>
+            <div class="memory-card" data-emoji="🎂">
+                <div class="front-face">🎂</div>
+                <div class="back-face">?</div>
+            </div>
+            <div class="memory-card" data-emoji="🎁">
+                <div class="front-face">🎁</div>
+                <div class="back-face">?</div>
+            </div>
+            <div class="memory-card" data-emoji="🎁">
+                <div class="front-face">🎁</div>
+                <div class="back-face">?</div>
+            </div>
+            <div class="memory-card" data-emoji="🎈">
+                <div class="front-face">🎈</div>
+                <div class="back-face">?</div>
+            </div>
+            <div class="memory-card" data-emoji="🎈">
+                <div class="front-face">🎈</div>
+                <div class="back-face">?</div>
+            </div>
+            <div class="memory-card" data-emoji="👑">
+                <div class="front-face">👑</div>
+                <div class="back-face">?</div>
+            </div>
+            <div class="memory-card" data-emoji="👑">
+                <div class="front-face">👑</div>
+                <div class="back-face">?</div>
+            </div>
+        </div>
+        
+        <!-- Pesan Tambahan (Muncul hanya jika MENANG game) -->
+        <div class="secret-message" id="message">
+            🎉 KAMU MENANG! 🎉<br>
+            "Semoga panjang umur, sehat selalu, dan dilancarkan segala urusannya. Terima kasih sudah menjadi orang baik!" ❤️
+        </div>
+    </div>
+
+    <script>
+        const cards = document.querySelectorAll('.memory-card');
+        const colors = ['#ff6b81', '#1e90ff', '#2ed573', '#ffa502', '#ff4757', '#9b59b6'];
+        
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let matchedPairs = 0;
+
+        function startGame() {
+            const music = document.getElementById('bg-music');
+            music.play().catch(error => console.log("Audio diblokir:", error));
+
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('game-board').style.display = 'grid';
+
+            cards.forEach(card => {
+                let randomPos = Math.floor(Math.random() * 8);
+                card.style.order = randomPos;
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flip');
+
+            if (!hasFlippedCard) {
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            
+            matchedPairs++;
+            createConfetti(10);
+
+            if(matchedPairs === 4) {
+                setTimeout(() => {
+                    document.getElementById('message').style.display = 'block';
+                    createConfetti(60); 
+                }, 500);
+            }
+
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+
+            setTimeout(() => {
+                firstCard.classList.remove('flip');
+                secondCard.classList.remove('flip');
+                resetBoard();
+            }, 1000);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        function createConfetti(count) {
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.transform = `scale(${Math.random() * 1 + 0.5})`;
+                confetti.style.animationDuration = Math.random() * 2 + 2 + 's'; 
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 4000);
+            }
+        }
+
+        cards.forEach(card => card.addEventListener('click', flipCard));
+    </script>
+</body>
+</html>
